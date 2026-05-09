@@ -17,7 +17,8 @@ const app = express();
 const allowedOrigins = ['http://localhost:3001', 
     "https://katforever.in",
     "https://www.katforever.in",
-    'http://localhost:5173'];
+    'http://localhost:5173',
+    'https://admin.katforever.in'];
 app.use(cors({
     origin: function (origin, callback) {
         // allow requests with no origin (like mobile apps or curl requests)
