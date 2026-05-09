@@ -13,7 +13,7 @@ const cartSchema = mongoose.Schema({
     sessionId: {
         type: String,
         sparse: true, // Allows null for logged-in user carts
-        index: true
+        // index: true
     },
 
     items: [{
@@ -45,7 +45,7 @@ const cartSchema = mongoose.Schema({
 }, { timestamps: true });
 
 // Ensure either user OR sessionId exists (not both, not neither)
-cartSchema.index({ user: 1 }, { unique: true, sparse: true });
-cartSchema.index({ sessionId: 1 }, { unique: true, sparse: true });
+// cartSchema.index({ user: 1 }, { unique: true, sparse: true });
+// cartSchema.index({ sessionId: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('Cart', cartSchema);
