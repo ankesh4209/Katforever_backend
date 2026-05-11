@@ -1,3 +1,147 @@
+# =========================================================
+# Production-Ready Node.js / MERN Stack .gitignore
+# =========================================================
+
+# -------------------------
+# Dependencies
+# -------------------------
 node_modules/
+jspm_packages/
+bower_components/
+
+# -------------------------
+# Environment Variables
+# -------------------------
 .env
 .env.*
+!.env.example
+
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# -------------------------
+# Build / Production Files
+# -------------------------
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.tmp/
+.temp/
+public/build/
+
+# -------------------------
+# Logs
+# -------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -------------------------
+# Runtime Files
+# -------------------------
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# -------------------------
+# Coverage / Testing
+# -------------------------
+coverage/
+.nyc_output/
+junit.xml
+
+# -------------------------
+# TypeScript
+# -------------------------
+*.tsbuildinfo
+
+# -------------------------
+# Database / Local Storage
+# -------------------------
+*.sqlite
+*.sqlite3
+*.db
+
+# -------------------------
+# Uploads / User Files
+# -------------------------
+uploads/
+tmp/
+temp/
+
+# -------------------------
+# Cache
+# -------------------------
+.cache/
+.parcel-cache/
+.eslintcache
+
+# -------------------------
+# Docker
+# -------------------------
+.docker/
+
+# -------------------------
+# Package Managers
+# -------------------------
+.pnp/
+.pnp.js
+
+# -------------------------
+# IDE / Editor Files
+# -------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -------------------------
+# OS Files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Firebase
+# -------------------------
+.firebase/
+
+# -------------------------
+# Vercel / Netlify
+# -------------------------
+.vercel/
+.netlify/
+
+# -------------------------
+# AWS / Cloud
+# -------------------------
+.aws/
+.elasticbeanstalk/
+
+# -------------------------
+# PM2
+# -------------------------
+.pm2/
+
+# -------------------------
+# Misc
+# -------------------------
+*.tgz
+*.gz
+
+# -------------------------
+# Optional Secrets
+# -------------------------
+secret/
+secrets/
+private/
