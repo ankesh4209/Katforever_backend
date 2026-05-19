@@ -47,6 +47,13 @@ const orderSchema = mongoose.Schema({
         razorpaySignature: { type: String },
         paidAt: { type: Date }
     },
+    advancePayment: {
+        amount: { type: Number, default: 0.0 },
+        razorpayOrderId: { type: String },
+        razorpayPaymentId: { type: String },
+        razorpaySignature: { type: String },
+        paidAt: { type: Date }
+    },
 
     // Order Status Lifecycle
     orderStatus: {

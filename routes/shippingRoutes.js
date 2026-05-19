@@ -14,7 +14,6 @@ router.put('/:orderId/ship', protect, admin, shipWithShiprocket);
 router.put('/:orderId/manual-ship', protect, admin, shipManually);
 router.post('/bulk-ship', protect, admin, bulkShipOrders);
 
-// Public tracking route (no auth required, just order ID)
 router.get('/track/:orderId', getOrderTracking);
 
 module.exports = router;

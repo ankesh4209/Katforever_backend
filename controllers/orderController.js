@@ -53,9 +53,10 @@ const addOrderItems = async (req, res) => {
             taxPrice: taxPrice || 0,
             shippingPrice: shippingPrice || 0,
             totalPrice,
+            advancePayment: req.body.advancePayment || {},
 
             // Initial states based on payment method
-            paymentStatus: paymentMethod === 'COD' ? 'Pending' : 'Pending',
+            paymentStatus: 'Pending',
             orderStatus: 'Pending', // Remains pending until payment confirmed or admin processes
         });
 
