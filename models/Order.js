@@ -25,7 +25,6 @@ const orderSchema = mongoose.Schema({
 
     // Pricing breakdown
     itemsPrice: { type: Number, required: true, default: 0.0 },
-    taxPrice: { type: Number, default: 0.0 },
     shippingPrice: { type: Number, default: 0.0 },
     totalPrice: { type: Number, required: true, default: 0.0 },
 

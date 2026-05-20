@@ -3,9 +3,7 @@ const asyncHandler = require('express-async-handler');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 
-// @desc    Create new order
-// @route   POST /api/orders
-// @access  Private
+
 const addOrderItems = async (req, res) => {
     try {
         const {
@@ -13,7 +11,6 @@ const addOrderItems = async (req, res) => {
             shippingAddress,
             paymentMethod,
             itemsPrice,
-            taxPrice,
             shippingPrice,
             totalPrice,
         } = req.body;
@@ -50,7 +47,6 @@ const addOrderItems = async (req, res) => {
             shippingAddress,
             paymentMethod: paymentMethod || 'COD',
             itemsPrice,
-            taxPrice: taxPrice || 0,
             shippingPrice: shippingPrice || 0,
             totalPrice,
             advancePayment: req.body.advancePayment || {},
