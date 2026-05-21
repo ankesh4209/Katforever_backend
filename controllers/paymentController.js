@@ -1,6 +1,7 @@
 
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+require('dotenv').config();
 
 // Initialize Razorpay
 // Ideally store these in .env
