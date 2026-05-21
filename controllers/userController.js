@@ -1,6 +1,80 @@
 
+const axios = require('axios');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+
+const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
+const WHATSAPP_TEMPLATE_NAME = process.env.WHATSAPP_TEMPLATE_NAME || 'kat_user_authentication';
+
+const normalizeWhatsAppPhone = (phone) => {
+    if (!phone) return '';
+    const cleaned = String(phone).replace(/[^0-9]/g, '');
+    if (cleaned.length === 10) {
+        return `91${cleaned}`;
+    }
+    return cleaned;
+};
+
+const sendWhatsAppOTP = async (phone, otp) => {
+    if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID) {
+        throw new Error('WhatsApp access token or phone number ID is not configured');
+    }
+
+    const normalizedPhone = normalizeWhatsAppPhone(phone);
+    if (!normalizedPhone) {
+        throw new Error('Invalid phone number for WhatsApp');
+    }
+
+    const to = normalizedPhone;
+    const url = `https://graph.facebook.com/v25.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`;
+
+    console.log('Sending WhatsApp OTP to', phone, 'normalized to', to);
+
+    const payload = {
+        messaging_product: 'whatsapp',
+        to,
+        type: 'template',
+        template: {
+            name: WHATSAPP_TEMPLATE_NAME,
+            language: {
+                code: 'en_US'
+            },
+            components: [
+                {
+                    type: 'body',
+                    parameters: [
+                        {
+                            type: 'text',
+                            text: otp.toString()
+                        }
+                    ]
+                },
+                {
+                    type: 'button',
+                    sub_type: 'url',
+                    index: '0',
+                    parameters: [
+                        {
+                            type: 'text',
+                            text: 'Verify'
+                        }
+                    ]
+                }
+            ]
+        }
+    };
+
+    const response = await axios.post(url, payload, {
+        headers: {
+            Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    console.log('WHATSAPP_SEND_RESPONSE', response.data);
+
+};
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -261,8 +335,7 @@ const sendOTP = async (req, res) => {
 
         let user = await User.findOne({ phone });
 
-        // Default OTP for Demo as requested
-        const otp = '123456';
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
         if (user) {
@@ -279,8 +352,19 @@ const sendOTP = async (req, res) => {
             });
         }
 
-        // MOCK TWILIO SEND
-        console.log(`📱 [Twilio Mock] Sending OTP ${otp} to ${phone}`);
+        console.log('Prepared OTP for', phone, 'OTP:', otp);
+
+        try {
+            await sendWhatsAppOTP(phone, otp);
+            console.log(`📱 WhatsApp OTP ${otp} sent to ${phone}`);
+        } catch (whatsappError) {
+            console.error('WHATSAPP_SEND_ERROR:', whatsappError.message || whatsappError);
+            return res.status(500).json({
+                success: false,
+                message: 'Unable to send OTP via WhatsApp',
+                error: whatsappError.message || whatsappError
+            });
+        }
 
         res.json({
             success: true,
@@ -312,11 +396,11 @@ const verifyOTP = async (req, res) => {
         }
 
         // Check if OTP matches and is not expired
-        // Always allow 123456 for demo as requested
-        if ((user.otp === otp || otp === '123456') && user.otpExpires > Date.now()) {
+        if (user.otp === otp && user.otpExpires > Date.now()) {
             const isNewUser = user.name.startsWith('User ');
 
             user.otp = undefined;
+            await user.save();
             const token = generateToken(user._id);
 
             // Set HTTP-only cookie

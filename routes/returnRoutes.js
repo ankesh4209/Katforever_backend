@@ -18,7 +18,6 @@ router.route('/myreturns').get(protect, getMyReturns);
 router.route('/:id').get(protect, getReturnById);
 router.route('/:id/cancel').put(protect, cancelReturnRequest);
 
-// Admin routes
 router.route('/admin/all').get(protect, admin, getAllReturns);
 router.route('/admin/:id/status').put(protect, admin, updateReturnStatus);
 router.route('/admin/:id/refund').put(protect, admin, processRefund);

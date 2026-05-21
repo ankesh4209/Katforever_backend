@@ -5,10 +5,8 @@ const SHIPROCKET_API = 'https://apiv2.shiprocket.in/v1/external';
 let authToken = null;
 let tokenExpiry = null;
 
-// @desc    Login to Shiprocket and get auth token
 const shiprocketLogin = async () => {
     try {
-        // Check if token is still valid
         if (authToken && tokenExpiry && new Date() < tokenExpiry) {
             return authToken;
         }
@@ -39,7 +37,6 @@ const createShipment = async (orderData) => {
             order_date: new Date().toISOString().split('T')[0],
             pickup_location: "Primary",
 
-            // Billing details (customer)
             billing_customer_name: orderData.customer.name,
             billing_last_name: "",
             billing_address: orderData.shippingAddress.address,
@@ -110,7 +107,6 @@ const createShipment = async (orderData) => {
     }
 };
 
-// @desc    Generate AWB (tracking number) for shipment
 const generateAWB = async (shipmentId, courierId = null) => {
     try {
         const token = await shiprocketLogin();
@@ -184,7 +180,6 @@ const trackShipment = async (awbCode) => {
     }
 };
 
-// @desc    Schedule pickup for shipment
 const schedulePickup = async (shipmentId) => {
     try {
         const token = await shiprocketLogin();
@@ -218,7 +213,7 @@ const schedulePickup = async (shipmentId) => {
     }
 };
 
-// @desc    Cancel shipment
+
 const cancelShipment = async (orderId) => {
     try {
         const token = await shiprocketLogin();

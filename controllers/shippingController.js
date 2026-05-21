@@ -8,9 +8,6 @@ const {
     schedulePickup
 } = require('../utils/shiprocketService');
 
-// @desc    Ship order with Shiprocket integration
-// @route   PUT /api/shipping/:orderId/ship
-// @access  Private/Admin
 const shipWithShiprocket = asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.orderId)
         .populate('user', 'name email phone')
@@ -26,7 +23,6 @@ const shipWithShiprocket = asyncHandler(async (req, res) => {
         throw new Error('Order must be in Processing state to ship');
     }
 
-    // Prepare shipment data
     const shipmentData = {
         orderId: order._id.toString(),
         customer: {
@@ -58,7 +54,6 @@ const shipWithShiprocket = asyncHandler(async (req, res) => {
         }
     };
 
-    // Create shipment on Shiprocket
     const shipmentResult = await createShipment(shipmentData);
 
     if (!shipmentResult.success) {
@@ -119,9 +114,6 @@ const shipWithShiprocket = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Ship order manually (without Shiprocket)
-// @route   PUT /api/shipping/:orderId/manual-ship
-// @access  Private/Admin
 const shipManually = asyncHandler(async (req, res) => {
     const { trackingNumber, courierName, courierPhone } = req.body;
 
@@ -137,7 +129,7 @@ const shipManually = asyncHandler(async (req, res) => {
         throw new Error('Order must be in Processing state');
     }
 
-    // Update order with manual tracking details
+
     order.orderStatus = 'Shipped';
     order.trackingNumber = trackingNumber || '';
     order.courierDetails = {
@@ -161,9 +153,7 @@ const shipManually = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Get real-time tracking for order
-// @route   GET /api/shipping/track/:orderId
-// @access  Public (with order ID)
+
 const getOrderTracking = asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.orderId)
         .select('orderStatus trackingNumber courierDetails trackingUpdates isDelivered deliveredAt');
@@ -173,7 +163,6 @@ const getOrderTracking = asyncHandler(async (req, res) => {
         throw new Error('Order not found');
     }
 
-    // If Shiprocket, get live tracking
     let liveTracking = null;
     if (order.courierDetails?.provider === 'Shiprocket' && order.trackingNumber) {
         const trackingResult = await trackShipment(order.trackingNumber);
@@ -190,7 +179,6 @@ const getOrderTracking = asyncHandler(async (req, res) => {
         isDelivered: order.isDelivered,
         deliveredAt: order.deliveredAt,
 
-        // Live tracking from Shiprocket
         liveTracking: liveTracking ? {
             currentStatus: liveTracking.currentStatus,
             currentLocation: liveTracking.currentLocation,
@@ -203,9 +191,7 @@ const getOrderTracking = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Bulk ship orders with Shiprocket
-// @route   POST /api/shipping/bulk-ship
-// @access  Private/Admin
+
 const bulkShipOrders = asyncHandler(async (req, res) => {
     const { orderIds } = req.body;
 
@@ -231,7 +217,6 @@ const bulkShipOrders = asyncHandler(async (req, res) => {
                 continue;
             }
 
-            // Create shipment (similar to shipWithShiprocket)
             const shipmentData = {
                 orderId: order._id.toString(),
                 customer: {

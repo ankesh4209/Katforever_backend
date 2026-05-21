@@ -16,7 +16,7 @@ const resetAdmin = async () => {
         const newAdmin = new User({
             name: 'Super Admin',
             email: 'admin@katforever.com',
-            password: 'AdminPassword123!',
+            password: 'admin123',
             phone: '0000000000',
             isAdmin: true
         });
@@ -24,7 +24,7 @@ const resetAdmin = async () => {
         await newAdmin.save();
         console.log('✅ New admin created successfully.');
         console.log('Email: admin@katforever.com');
-        console.log('Password: AdminPassword123!');
+        console.log('Password: admin123');
 
         process.exit(0);
     } catch (error) {

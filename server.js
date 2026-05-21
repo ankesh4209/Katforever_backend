@@ -69,6 +69,7 @@ const shippingRoutes = require('./routes/shippingRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const newsletterRoutes = require('./routes/newsletterRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 // ...
@@ -90,6 +91,7 @@ app.use('/api/shipping', shippingRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Error Handling (must be after routes)
 app.use(notFound);
