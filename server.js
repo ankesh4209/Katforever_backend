@@ -16,6 +16,7 @@ const app = express();
 // CORS configuration
 const allowedOrigins = [
     'http://localhost:5173',
+    'http://localhost:5174',
     'https://katforever.in',
     'https://www.katforever.in',
     'https://admin.katforever.in'
