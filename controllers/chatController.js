@@ -4,8 +4,11 @@ const axios = require("axios");
 const generateChatResponse = asyncHandler(async (req, res) => {
   const { message, history } = req.body;
 
-  if (!message || typeof message !== "string") {
-    return res.status(400).json({ message: "Message is required" });
+  if (!message || typeof message !== "string" || !message.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Message is required",
+    });
   }
 
   const openAiKey =
@@ -15,7 +18,10 @@ const generateChatResponse = asyncHandler(async (req, res) => {
     process.env.OPENAI_SECRET;
 
   if (!openAiKey) {
-    return res.status(500).json({ message: "OpenAI API key is not configured" });
+    return res.status(500).json({
+      success: false,
+      message: "OpenAI API key is not configured",
+    });
   }
 
   const safeHistory = Array.isArray(history)
@@ -24,29 +30,34 @@ const generateChatResponse = asyncHandler(async (req, res) => {
           (item) =>
             item &&
             ["user", "assistant"].includes(item.role) &&
-            typeof item.content === "string"
+            typeof item.content === "string" &&
+            item.content.trim()
         )
         .slice(-6)
+        .map((item) => ({
+          role: item.role,
+          content: item.content.trim().slice(0, 800),
+        }))
     : [];
 
   const messages = [
     {
       role: "system",
       content:
-        "You are a friendly customer support assistant for Kat Forever. Answer in a helpful, concise, and polite way about shopping, orders, payments, returns, and product details.",
+        "You are a friendly customer support assistant for Kat Forever. Answer in a helpful, concise, and polite way about shopping, orders, payments, returns, cancellation, shipping, and product details. Keep answers short and clear.",
     },
     ...safeHistory,
     {
       role: "user",
-      content: message.trim(),
+      content: message.trim().slice(0, 1000),
     },
   ];
 
   const payload = {
     model: "gpt-4o-mini",
     messages,
-    temperature: 0.6,
-    max_tokens: 300,
+    temperature: 0.5,
+    max_tokens: 220,
   };
 
   try {
@@ -65,10 +76,16 @@ const generateChatResponse = asyncHandler(async (req, res) => {
     const chatText = response.data?.choices?.[0]?.message?.content?.trim();
 
     if (!chatText) {
-      return res.status(502).json({ message: "No response from OpenAI" });
+      return res.status(502).json({
+        success: false,
+        message: "No response from AI service",
+      });
     }
 
-    return res.status(200).json({ message: chatText });
+    return res.status(200).json({
+      success: true,
+      message: chatText,
+    });
   } catch (error) {
     const status = error.response?.status;
     const openAiMessage =
@@ -77,14 +94,16 @@ const generateChatResponse = asyncHandler(async (req, res) => {
     if (status === 401 || status === 403) {
       console.error(`OpenAI auth failed (${status}): ${openAiMessage}`);
       return res.status(502).json({
+        success: false,
         message:
-          "OpenAI authorization failed. Please verify your OpenAI API key and billing permissions.",
+          "OpenAI authorization failed. Please verify your API key and billing permissions.",
       });
     }
 
     if (status === 429) {
       console.error(`OpenAI rate limit (${status}): ${openAiMessage}`);
       return res.status(429).json({
+        success: false,
         message:
           "Too many AI requests. Please wait a few seconds and try again.",
       });
@@ -92,7 +111,8 @@ const generateChatResponse = asyncHandler(async (req, res) => {
 
     if (error.code === "ECONNABORTED") {
       return res.status(504).json({
-        message: "OpenAI request timeout. Please try again.",
+        success: false,
+        message: "AI request timeout. Please try again.",
       });
     }
 
@@ -101,6 +121,7 @@ const generateChatResponse = asyncHandler(async (req, res) => {
     );
 
     return res.status(502).json({
+      success: false,
       message: "AI service is temporarily unavailable. Please try again later.",
     });
   }
