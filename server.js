@@ -30,6 +30,10 @@ const webhookRoutes = require('./routes/webhookRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const newsletterRoutes = require('./routes/newsletterRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
+
+
 
 // Load env
 dotenv.config();
@@ -122,7 +126,8 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/chat', chatRoutes);
-
+app.use('/api/reports', reportRoutes);
+app.use('/api/settings', settingsRoutes);
 /* ======================================================
    Error Handling Middleware
 ====================================================== */
