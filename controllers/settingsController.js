@@ -15,7 +15,8 @@ const getSettings = asyncHandler(async (req, res) => {
       email: '',
       notifications: true,
       emailUpdates: false,
-      twoFactorAuth: true
+      twoFactorAuth: true,
+      productLimit: 20
     });
   }
 
@@ -52,6 +53,9 @@ const updateSettings = asyncHandler(async (req, res) => {
 
   settings.twoFactorAuth =
     req.body.twoFactorAuth;
+
+  settings.productLimit =
+    req.body.productLimit !== undefined ? Number(req.body.productLimit) : settings.productLimit;
 
   const updated = await settings.save();
 

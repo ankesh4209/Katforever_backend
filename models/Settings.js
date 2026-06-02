@@ -35,6 +35,11 @@ const settingsSchema = new mongoose.Schema(
     twoFactorAuth: {
       type: Boolean,
       default: true
+    },
+
+    productLimit: {
+      type: Number,
+      default: 20
     }
   },
   {

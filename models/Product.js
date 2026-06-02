@@ -8,6 +8,7 @@ const productSchema = mongoose.Schema({
         ref: 'User'
     },
     sku: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     images: [{ type: String }],
     categoryId: { type: String, required: true },
@@ -46,5 +47,40 @@ const productSchema = mongoose.Schema({
         default: true
     }
 }, { timestamps: true });
+
+// Pre-validate hook to auto-generate unique slug from product name
+productSchema.pre('validate', async function (next) {
+    if (this.isModified('name') || !this.slug) {
+        const slugify = (text) => {
+            return text
+                .toString()
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-');
+        };
+
+        let baseSlug = slugify(this.name || 'product');
+        let uniqueSlug = baseSlug;
+        let count = 1;
+        const Product = mongoose.model('Product');
+
+        // Dynamic collision check
+        while (true) {
+            const exists = await Product.findOne({
+                slug: uniqueSlug,
+                _id: { $ne: this._id }
+            });
+            if (!exists) {
+                break;
+            }
+            uniqueSlug = `${baseSlug}-${count}`;
+            count++;
+        }
+        this.slug = uniqueSlug;
+    }
+    next();
+});
 
 module.exports = mongoose.model('Product', productSchema);

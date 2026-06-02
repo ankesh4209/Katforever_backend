@@ -1,13 +1,17 @@
 const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
+const Settings = require('../models/Settings');
 
 // @desc    Fetch all products with search, filter, sort, and pagination
 // @route   GET /api/products?search=shirt&category=1&minPrice=500&maxPrice=2000&sort=price&page=1&limit=20
 // @access  Public
 const getProducts = async (req, res) => {
     try {
-        const { search, category, minPrice, maxPrice, sort, page = 1, limit = 20, active } = req.query;
+        const appSettings = await Settings.findOne();
+        const defaultLimit = appSettings?.productLimit || 20;
+        
+        const { search, category, minPrice, maxPrice, sort, page = 1, limit = defaultLimit, active } = req.query;
 
         // Build query object for base search (excluding price filter)
         let baseQuery = {};
@@ -225,6 +229,24 @@ const createProduct = async (req, res) => {
             });
         }
 
+        // Validate slug uniqueness
+        const slugify = (text) => {
+            return text
+                .toString()
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-');
+        };
+        const generatedSlug = slugify(name);
+        const slugExists = await Product.findOne({ slug: generatedSlug });
+        if (slugExists) {
+            return res.status(400).json({
+                message: 'A product with this name/slug already exists.'
+            });
+        }
+
         // Validate category exists
         const category = await Category.findById(categoryId);
         if (!category) {
@@ -295,6 +317,29 @@ const updateProduct = async (req, res) => {
             if (skuExists) {
                 return res.status(400).json({
                     message: 'A product with this SKU already exists.'
+                });
+            }
+        }
+
+        // Validate slug uniqueness if name is being updated
+        if (req.body.name && req.body.name !== product.name) {
+            const slugify = (text) => {
+                return text
+                    .toString()
+                    .toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\-]+/g, '')
+                    .replace(/\-\-+/g, '-');
+            };
+            const generatedSlug = slugify(req.body.name);
+            const slugExists = await Product.findOne({
+                slug: generatedSlug,
+                _id: { $ne: product._id }
+            });
+            if (slugExists) {
+                return res.status(400).json({
+                    message: 'A product with this name/slug already exists.'
                 });
             }
         }

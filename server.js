@@ -39,7 +39,10 @@ const settingsRoutes = require('./routes/settingsRoutes');
 dotenv.config();
 
 // Connect Database
-connectDB();
+connectDB().then(() => {
+    const { runDatabaseMigration } = require('./utils/dbMigration');
+    runDatabaseMigration();
+});
 
 // Initialize app
 const app = express();
