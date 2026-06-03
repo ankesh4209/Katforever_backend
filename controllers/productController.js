@@ -22,14 +22,17 @@ const getProducts = async (req, res) => {
         }
 
         // Filter by category (supports both ObjectId and category name)
-        if (category) {
+        if (category && category !== 'All' && category !== 'undefined' && category !== 'null') {
             if (mongoose.Types.ObjectId.isValid(category)) {
-                baseQuery.categoryId = new mongoose.Types.ObjectId(category);
+                baseQuery.categoryId = category.toString();
             } else {
-                // Lookup category by name
-                const categoryDoc = await Category.findOne({ name: { $regex: new RegExp(`^${category}$`, 'i') } });
+                // Lookup category by name (trim and ignore leading/trailing whitespace)
+                const cleanCategory = category.trim();
+                const categoryDoc = await Category.findOne({ 
+                    name: { $regex: new RegExp(`^\\s*${cleanCategory.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\s*$`, 'i') } 
+                });
                 if (categoryDoc) {
-                    baseQuery.categoryId = categoryDoc._id;
+                    baseQuery.categoryId = categoryDoc._id.toString();
                 } else {
                     baseQuery.categoryId = category; // fallback
                 }
