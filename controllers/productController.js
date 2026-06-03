@@ -73,19 +73,19 @@ const getProducts = async (req, res) => {
         // Sort options
         if (sort) {
             const sortOptions = {
-                'price': { price: 1 },
-                'price-asc': { price: 1 },
-                '-price': { price: -1 },
-                'price-desc': { price: -1 },
-                'name': { name: 1 },
-                '-name': { name: -1 },
-                'rating': { rating: -1 },
-                'best-selling': { rating: -1 },
-                'newest': { createdAt: -1 }
+                'price': { price: 1, _id: -1 },
+                'price-asc': { price: 1, _id: -1 },
+                '-price': { price: -1, _id: -1 },
+                'price-desc': { price: -1, _id: -1 },
+                'name': { name: 1, _id: -1 },
+                '-name': { name: -1, _id: -1 },
+                'rating': { rating: -1, _id: -1 },
+                'best-selling': { rating: -1, _id: -1 },
+                'newest': { createdAt: -1, _id: -1 }
             };
-            productsQuery = productsQuery.sort(sortOptions[sort] || { createdAt: -1 });
+            productsQuery = productsQuery.sort(sortOptions[sort] || { createdAt: -1, _id: -1 });
         } else {
-            productsQuery = productsQuery.sort({ createdAt: -1 });
+            productsQuery = productsQuery.sort({ createdAt: -1, _id: -1 });
         }
 
         // Apply pagination

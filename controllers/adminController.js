@@ -107,7 +107,7 @@ const getAllOrders = async (req, res) => {
 
         const orders = await Order.find({})
             .populate('user', 'name email')
-            .sort({ createdAt: -1 })
+            .sort({ createdAt: -1, _id: -1 })
             .skip(skip)
             .limit(limitNum);
 
