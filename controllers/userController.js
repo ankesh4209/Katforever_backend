@@ -2,6 +2,11 @@
 const axios = require('axios');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const dotenv = require('dotenv');
+
+
+dotenv.config();
+
 
 const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
