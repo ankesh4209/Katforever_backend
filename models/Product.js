@@ -49,7 +49,7 @@ const productSchema = mongoose.Schema({
 }, { timestamps: true });
 
 // Pre-validate hook to auto-generate unique slug from product name
-productSchema.pre('validate', async function (next) {
+productSchema.pre('validate', async function () {
     if (this.isModified('name') || !this.slug) {
         const slugify = (text) => {
             return text
@@ -80,7 +80,6 @@ productSchema.pre('validate', async function (next) {
         }
         this.slug = uniqueSlug;
     }
-    next();
 });
 
 module.exports = mongoose.model('Product', productSchema);
