@@ -165,6 +165,6 @@ exports.sendBroadcastToAll = async (req, res) => {
     console.error("Bulk Broadcast Error:", error);
     res
       .status(500)
-      .json({ success: false, message: "Server error during broadcast." });
+      .json({ success: false, message: `Server error during broadcast: ${error.message}` });
   }
 };
