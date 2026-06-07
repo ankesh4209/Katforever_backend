@@ -77,6 +77,40 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 /* ======================================================
+   Security Headers Middleware
+====================================================== */
+app.use((req, res, next) => {
+    // Strict-Transport-Security (HSTS)
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+    // X-Content-Type-Options
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    // X-Frame-Options
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    // X-XSS-Protection
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+    // Referrer-Policy
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    // Permissions-Policy
+    res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+
+    // Content-Security-Policy (CSP)
+    if (process.env.NODE_ENV !== 'production') {
+        // More relaxed CSP for local development (enables WebSockets, hot-reloading, dev tools)
+        res.setHeader(
+            "Content-Security-Policy",
+            "default-src 'self' http: https: 'unsafe-inline' 'unsafe-eval' data: blob:;"
+        );
+    } else {
+        // Strict CSP for production
+        res.setHeader(
+            "Content-Security-Policy",
+            "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://images.unsplash.com https://img.icons8.com https://placehold.co; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.razorpay.com; frame-src https://api.razorpay.com; object-src 'none';"
+        );
+    }
+    next();
+});
+
+/* ======================================================
    Global Middlewares
 ====================================================== */
 app.use(express.json());

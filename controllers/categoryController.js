@@ -6,7 +6,14 @@ const Category = require('../models/Category');
 // @access  Public
 const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find({ isActive: true }).sort({ displayOrder: 1 });
+        const { all } = req.query;
+        let query = {};
+        
+        if (all !== 'true') {
+            query.isActive = true;
+        }
+
+        const categories = await Category.find(query).sort({ displayOrder: 1 });
         res.json(categories);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
